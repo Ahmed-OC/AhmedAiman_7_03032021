@@ -1,32 +1,46 @@
 <script>
-
+import Headerlogin from "../components/Headerlogin.vue"
 export default {
-	name: 'login'
+	name: 'login',
+    components: {Headerlogin}
 }
 </script>
 
 <template>
-    <form>	
-    <div class="row mb-3">
-        <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
-        <div class="col-sm-10">
-        <input type="email" class="form-control" id="inputEmail3">
+    <div class="login">
+        <Headerlogin />
+        <div class="card">
+            <form>
+                <div class="form-group row d-flex justify-content-center">
+                <div class="col-8">
+                    <label for="InputNickname">Pseudo</label>
+                    <input type="text" class="form-control" id="InputNickname" placeholder="Pseudo">
+                </div>
+                </div>
+                <div class="form-group row d-flex justify-content-center">
+                <div class="col-8">
+                <label for="InputEmail">Email</label>
+                <input type="email" class="form-control" id="InputEmail" placeholder="Email">
+                </div>
+                </div>
+                <div class="form-group row d-flex justify-content-center">
+                <div class="col-8">
+                <label for="InputPassword">Mot de passe</label>
+                <input type="password" class="form-control" id="InputPassword" placeholder="Mot de passe">
+                </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3 mb-3">Se connecter</button>
+            </form>
         </div>
-    </div>
-    <div class="row mb-3">
-        <label for="inputPassword3" class="col-sm-2 col-form-label">Mot de passe</label>
-        <div class="col-sm-10">
-        <input type="password" class="form-control" id="inputPassword3">
-        </div>
-    </div>
-    <button type="submit" class="btn btn-primary">Connexion</button>
-    </form>
+     </div>
 </template>
 <style scoped>
-    form
-    {
-        background-color: #ffd7d7;
-        padding-right: 20px;
-        padding-left: 20px;
-    }
+.card
+{
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  border-radius: 20px;
+  background-color: #ffd7d7;
+}
 </style>

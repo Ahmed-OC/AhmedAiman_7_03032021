@@ -1,11 +1,6 @@
 <template>
   <div id="app">
-    <div class="img-header"> <img src="../src/assets/icon.svg" ></div>
-    <div id="nav">
-      <router-link to="/signup">S'inscrire</router-link>
-      <router-link to="/login">Se connecter</router-link>
-    </div>
-      <router-view/>
+    <router-view/>
   </div>  
 </template>
 
@@ -16,12 +11,6 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  .img-header{
-    margin: 0 auto;
-    width: 200px;
-    height: 200px;
-    
-  }
 }
 
 #nav {
