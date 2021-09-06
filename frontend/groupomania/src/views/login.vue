@@ -13,12 +13,6 @@ export default {
             <form>
                 <div class="form-group row d-flex justify-content-center">
                 <div class="col-8">
-                    <label for="InputNickname">Pseudo</label>
-                    <input type="text" class="form-control" id="InputNickname" placeholder="Pseudo">
-                </div>
-                </div>
-                <div class="form-group row d-flex justify-content-center">
-                <div class="col-8">
                 <label for="InputEmail">Email</label>
                 <input type="email" class="form-control" id="InputEmail" placeholder="Email">
                 </div>
