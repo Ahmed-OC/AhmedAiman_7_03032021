@@ -1,10 +1,16 @@
 <script>
-import Headerlogin from '../components/Headerlogin.vue'
+import HeaderLogin from '../components/Headerlogin.vue';
 export default {
-    name: "Home",
-    components: {Headerlogin}
+  name: 'Home',
+  components : {
+    HeaderLogin
+  }
 }
 </script>
+
+
 <template>
-    <Headerlogin/>
+  <div class="headerLogin">
+    <HeaderLogin/>
+  </div>
 </template>
