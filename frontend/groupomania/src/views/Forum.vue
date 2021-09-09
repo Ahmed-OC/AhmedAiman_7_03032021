@@ -20,3 +20,9 @@ export default {
         <ForumPosts/> 
     </div>
 </template>
+<style scoped lang="scss">
+  .forum
+  {
+    background-color: #fefee2;
+  }
+</style>

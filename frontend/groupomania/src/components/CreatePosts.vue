@@ -3,10 +3,12 @@ export default {
   name: 'CreatePosts',
   data () {
       return {
+          textarea : null, 
            item:{
           //...
           image : null,
-          imageUrl: null
+          imageUrl: null,
+          
         }
       }
 
@@ -31,6 +33,9 @@ export default {
         })
         .then((json) => {
             this.$store.dispatch('setCurrentPosts',json);
+            this.item.image = null;
+            this.item.imageUrl=null;
+            this.textarea = null;
         })
         .catch((error) => {
             console.log(error);
@@ -53,18 +58,15 @@ export default {
 
 <template>
     <div class='createPosts'>
-        <div class='container d-flex '>
-
+        <div class='container d-flex mb-3 justify-content-center'>
             <label v-if="!item.imageUrl" for="image" class="btn">Choisir une image</label>
             <input @change="uploadImage" id="image" type="file" accept="image/png, image/jpeg, image/jpg" >
             <div id="preview">
                 <button v-if="item.imageUrl" @click="delImg" id='delbtn'>X</button>
                 <img v-if="item.imageUrl" :src="item.imageUrl" />
             </div>
-
-            <textarea v-model='textarea' placeholder="Quelque chose à partager ?"></textarea>
-
-            <button @click="submitPost" >ENVOYER</button>
+            <textarea v-model="textarea" class="mx-3" placeholder="Quelque chose à partager ?"></textarea>
+            <button class="btn" @click="submitPost" >ENVOYER</button>
         </div>
     </div>
 </template>
@@ -75,11 +77,16 @@ export default {
         visibility: hidden;
         width: 0%;
     }
+    textarea{
+        border-radius: 20px;
+    }
     .btn
     {
+        border-radius: 20px;
         background-color: #ffd7d7;
         width: 10%;
-        
+        font-weight: bold;
+
     }
     textarea
     {

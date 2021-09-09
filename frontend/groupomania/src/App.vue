@@ -27,4 +27,8 @@
     }
   }
 }
+body
+{
+  background-color: #fefee2 ;
+}
 </style>
