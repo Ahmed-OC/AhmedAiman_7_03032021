@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const postsCtrl = require('../controllers/posts')
+const multer = require('../middleware/multer-config')
 
-router.post('/createPost', postsCtrl.createPost); 
+router.post('/createPost',multer, postsCtrl.createPost);
+router.get('/getAllPosts', postsCtrl.getAllPosts);
 module.exports=router;

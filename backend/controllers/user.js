@@ -29,13 +29,16 @@ exports.login = (req,res,next) =>
       if (err){
         res.status(403).json({error : err});
       };
-      const password = result[0].password;
+      if(result.length>0)
+      {
+        const password = result[0].password;
       bcrypt.compare(req.body.password, password)
       .then(valid => {
           if (!valid){
               return res.status(401).json({error:'Mot de passe incorrect !'});
           }
           res.status(200).json({
+            nickname: result[0].nickname,
             userId: result[0].id,
                 token: jwt.sign(
                     {userId : result[0].id},
@@ -45,6 +48,11 @@ exports.login = (req,res,next) =>
         });
       })
       .catch(error => res.status(500).json({error}));
+      }
+      else
+      {
+        res.status(401).json({error : "Utilisateur introuvable"})
+      }
     })
     
     

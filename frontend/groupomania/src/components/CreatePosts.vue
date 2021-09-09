@@ -9,30 +9,28 @@ export default {
           imageUrl: null
         }
       }
-     
+
   },
   methods : {
         submitPost(e){
           e.preventDefault();
-          const post = {
-              userId : localStorage.getItem('userId'),
-              file : this.item.imageUrl,
-              post_text : this.textarea
-          }
-          console.log(post);
+          const fd = new FormData()
+          fd.append('image',this.item.image);
+          fd.append('userId',localStorage.getItem('userId'));
+          fd.append('post_text',this.textarea)
           fetch('http://localhost:3000/api/posts/createPost', {
           method : "POST",
-          body :  JSON.stringify(post),
+          body :  fd,
           headers : {
               'Accept': 'application/json',
-              "Content-Type": "application/json",
+              'Authorization' : 'Bearer '+ localStorage.getItem('token'),
           }
         })
-        .then((response) => response.json())
+        .then((response) => {
+            return response.json();
+        })
         .then((json) => {
-         
-          console.log(json)
-         
+            this.$store.dispatch('setCurrentPosts',json);
         })
         .catch((error) => {
             console.log(error);
@@ -50,6 +48,7 @@ export default {
         }
     }
 }
+
 </script>
 
 <template>
