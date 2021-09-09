@@ -33,7 +33,7 @@ export default {
           {
               localStorage.setItem('userId', json.userId);
               localStorage.setItem('token', json.token)
-            this.$router.push('forum');
+              this.$router.push('forum');
             
           }
           

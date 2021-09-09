@@ -1,4 +1,5 @@
 const express =require('express');
+const path = require('path'); // Permet d'avoir acces aux chemins de notre systeme de fichiers
 const userRoutes = require('./routes/user');
 const postsRoutes = require('./routes/posts');
 
@@ -12,6 +13,7 @@ const postsRoutes = require('./routes/posts');
   });
 
   app.use(express.json());
+  app.use('/images', express.static(path.join(__dirname, 'images'))); // Permet que les requetes à /images/ servent le dossier images
   app.use('/api/auth', userRoutes);
   app.use('/api/posts', postsRoutes)
 

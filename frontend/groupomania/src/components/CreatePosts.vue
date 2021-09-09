@@ -16,7 +16,7 @@ export default {
           e.preventDefault();
           const post = {
               userId : localStorage.getItem('userId'),
-              imageUrl : this.item.imageUrl,
+              file : this.item.imageUrl,
               post_text : this.textarea
           }
           console.log(post);
