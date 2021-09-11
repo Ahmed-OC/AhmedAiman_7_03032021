@@ -14,8 +14,7 @@ export default {
 
   },
   methods : {
-        submitPost(e){
-          e.preventDefault();
+        submitPost(){
           const fd = new FormData()
           fd.append('image',this.item.image);
           fd.append('userId',localStorage.getItem('userId'));
@@ -36,6 +35,7 @@ export default {
             this.item.image = null;
             this.item.imageUrl=null;
             this.textarea = null;
+            document.getElementById('image').value='';
         })
         .catch((error) => {
             console.log(error);
@@ -50,6 +50,7 @@ export default {
         {
             this.item.imageUrl=null;
             this.item.image=null;
+            document.getElementById('image').value='';
         }
     }
 }

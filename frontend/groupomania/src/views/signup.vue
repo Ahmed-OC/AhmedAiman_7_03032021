@@ -41,6 +41,7 @@ export default {
 <template>
   <div class="signup">
     <HeaderLogin />
+    <span id='signupmsg'>Veuillez vous connecter</span>
     <div class="card">
       <form>
         <div class="form-group row d-flex justify-content-center">
@@ -63,6 +64,7 @@ export default {
         </div>
         <button @click="postSignup" type="submit" class="btn btn-primary mt-3 mb-3">S'inscrire</button>
       </form>
+      <p class="card-text"><small class="text-muted">Déjà membre ? <router-link  to="/login">Se connecter</router-link></small></p>
     </div>
   </div>
 </template>
@@ -77,4 +79,12 @@ export default {
     border-radius: 20px;
     background-color: #ffd7d7;
   }
+  #signupmsg
+ {
+   font-weight: bold;
+ }
+.card-text
+{
+  display: inline;
+}
 </style>

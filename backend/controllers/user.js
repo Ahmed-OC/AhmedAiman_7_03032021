@@ -8,7 +8,7 @@ exports.signup = (req,res,next) =>
     bcrypt.hash(req.body.password,10)
     .then(hash=>{
         const password=hash;
-        var sql = `INSERT INTO users (nickname, email, password) VALUES ('${nickname}','${email}','${password}')`;
+        var sql = `INSERT INTO users (nickname, email, password,admin) VALUES ('${nickname}','${email}','${password}','0')`;
         db.query(sql, function (err, result) {
              if (err){
                 res.status(403).json({error : err});
@@ -38,6 +38,7 @@ exports.login = (req,res,next) =>
               return res.status(401).json({error:'Mot de passe incorrect !'});
           }
           res.status(200).json({
+            admin: result[0].admin,
             nickname: result[0].nickname,
             userId: result[0].id,
                 token: jwt.sign(
