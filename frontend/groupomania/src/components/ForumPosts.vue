@@ -23,7 +23,7 @@
               <textarea v-model='updatePost.textarea' class="mx-3" placeholder="Quelque chose à partager ?"></textarea>
               <div class='d-flex flex-column'>
                 <button class="btn mb-2" @click="postUpdating">MODIFIER</button>
-                <button class="btn" @click="this.currentPostUpdate=null;this.currentPostUpdate.imageDeleted=0" >ANNULER</button>
+                <button class="btn" @click="this.currentPostUpdate=null;this.updatePost.imageDeleted=0" >ANNULER</button>
               </div>
             </div>
           </div>
@@ -38,7 +38,9 @@
 export default {
   name: 'ForumPosts',
   data (){
+    
     return {
+      nicknamep : this.nicknameprop,
       updatePost :{
         imageUrl: null,
         image : null,
@@ -52,7 +54,7 @@ export default {
     
     
   },
-   props:['postsList'] 
+   props:['postsList','nicknameprop'] 
   ,
   beforeMount(){
     fetch('http://localhost:3000/api/posts/getAllPosts',{
@@ -66,6 +68,7 @@ export default {
       if (json.error ==='Requête non authentifiée')
       {
         this.$router.push('login');
+        alert('Veuillez vous connecter');
       }
       else
       {
@@ -83,7 +86,13 @@ export default {
       })
       .then(res => res.json()) // or res.json()
       .then(json => {
+        if (json.error ==='Requête non authentifiée')
+        {
+          this.$router.push('login');
+          alert('Veuillez vous connecter');
+        }
         this.$store.dispatch('setCurrentPosts',json);
+        this.$store.dispatch('setCurrentPostsByNickname',this.nicknamep);
       })
       .catch(err=>err);
     },
@@ -110,7 +119,6 @@ export default {
     {
           const fd = new FormData()
           fd.append('image',this.updatePost.image);
-          fd.append('userId',localStorage.getItem('userId'));
           fd.append('post_text',this.updatePost.textarea);
           fd.append('imagedeleted',this.updatePost.imageDeleted)     
           fetch('http://localhost:3000/api/posts/updatePost/'+ this.currentPostUpdate, {
@@ -125,13 +133,20 @@ export default {
             return response.json();
         })
         .then((json) => {
+            if (json.error ==='Requête non authentifiée')
+            {
+              this.$router.push('login');
+              alert('Veuillez vous connecter');
+            }
             this.$store.dispatch('setCurrentPosts',json);
-            this.currentPostUpdate=null;
+            this.$store.dispatch('setCurrentPostsByNickname',this.nicknamep);
+            this.updatePost.image=null;
             this.imageDeleted = 0;
         })
         .catch((error) => {
             console.log(error);
         })
+        this.currentPostUpdate=null;
     }
    
   }

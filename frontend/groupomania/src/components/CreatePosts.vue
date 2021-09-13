@@ -31,6 +31,11 @@ export default {
             return response.json();
         })
         .then((json) => {
+            if (json.error ==='Requête non authentifiée')
+            {
+                this.$router.push('login');
+                alert('Veuillez vous connecter');
+            }
             this.$store.dispatch('setCurrentPosts',json);
             this.item.image = null;
             this.item.imageUrl=null;

@@ -31,6 +31,7 @@ export default {
         .then((json) => {
           if ( !json.error)
           {
+              
               localStorage.setItem('userId', json.userId);
               localStorage.setItem('token', json.token)
               localStorage.setItem('nickname',json.nickname)

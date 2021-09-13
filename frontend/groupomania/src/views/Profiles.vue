@@ -1,6 +1,7 @@
 <script>
 import HeaderForum from '../components/HeaderForum.vue';
 import ForumPosts from '../components/ForumPosts.vue';
+import UpdateProfile from '../components/UpdateProfile.vue';
 export default {
   name: 'Profiles',
     beforeMount(){
@@ -19,7 +20,7 @@ export default {
       }
       else
       {
-        this.postsProfile = json;
+        this.$store.state.PostsByNickname = json;
       }
     })
     .catch(err=> console.log (err));
@@ -27,11 +28,10 @@ export default {
   data (){
     return {
         nickname: window.location.href.split('profiles:')[1],
-        postsProfile : null,
     }
   },
   components : {
-    HeaderForum,ForumPosts
+    HeaderForum,ForumPosts,UpdateProfile
   },
   methods : {
     }
@@ -42,10 +42,10 @@ export default {
 <template>
   <div class="profile">
     <HeaderForum />
-    <img src="../assets/images/profil_inconnu.png">
-    <p id='userNickname'>{{this.nickname}}</p>
+    <UpdateProfile/>
     <h2>Articles : </h2>
-    <ForumPosts :postsList='this.postsProfile'/> 
+    <h3 v-if="this.$store.state.PostsByNickname.length==0" > Aucun article publié</h3>
+    <ForumPosts :nicknameprop='this.nickname' :postsList='this.$store.state.PostsByNickname'/> 
   </div>
 </template>
 

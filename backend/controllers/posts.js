@@ -83,7 +83,8 @@ exports.updatePost = (req,res,next) => {
     {
       const imageUrl=`${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
       const filename = result[0].imageUrl.split('/images/')[1];
-      fs.unlink(`images/${filename}`, () =>{
+      fs.unlink(`images/${filename}`, () =>{ 
+        
 
       });
 
@@ -98,6 +99,7 @@ exports.updatePost = (req,res,next) => {
       {
         const filename = result[0].imageUrl.split('/images/')[1];
         fs.unlink(`images/${filename}`, () =>{
+          
   
         });
   
@@ -125,12 +127,11 @@ exports.updatePost = (req,res,next) => {
 }
 
 exports.getPostsByNickname = (req, res , next) => {
-  var sql = `SELECT * FROM posts  WHERE nickname ='${req.params.id}' ORDER BY id DESC`;
+  var sql = `SELECT * FROM posts  WHERE nickname ='${req.params.nickname}' ORDER BY id DESC`;
   db.query(sql, function (err, result,fields) {
     if (err){
       return res.status(403).json({error : err});
     };
-    console.log(result)
     res.json(result);
 
   })
