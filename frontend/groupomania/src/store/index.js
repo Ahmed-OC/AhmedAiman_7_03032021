@@ -28,6 +28,14 @@ export default createStore({
       })
       .then(posts=> posts.json())
       .then(json=>{
+        if (json.error ==='Requête non authentifiée')
+        {
+          this.$swal.fire({
+                title : "Veuillez vous connecter",
+                icon : 'warning'
+                });
+          this.$router.push('login');
+        }
         if (json.error)
         {
           return json.error
@@ -38,7 +46,7 @@ export default createStore({
           context.commit('setCurrentPostsByNickname',json)
         }
       })
-      .catch(err=> console.log (err));
+      .catch(err=> err);
     },
   },
   modules: {

@@ -3,6 +3,10 @@ const path = require('path'); // Permet d'avoir acces aux chemins de notre syste
 const userRoutes = require('./routes/user');
 const postsRoutes = require('./routes/posts');
 
+const xss = require('xss-clean');
+const helmet = require('helmet');
+require('dotenv').config();
+
   const app = express();
   
   app.use((req, res, next) => { // permet de regler  le problème de CORS (Cross Origin Resource Sharing)
@@ -11,10 +15,11 @@ const postsRoutes = require('./routes/posts');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS'); // on donne l'autorisation d'utiliser certaines methodes
     next();
   });
-
+  app.use(helmet());
   app.use(express.json());
+  app.use(xss());
   app.use('/images', express.static(path.join(__dirname, 'images'))); // Permet que les requetes à /images/ servent le dossier images
-  app.use('/api/auth', userRoutes);
+  app.use('/api/users', userRoutes);
   app.use('/api/posts', postsRoutes)
 
   module.exports = app; 

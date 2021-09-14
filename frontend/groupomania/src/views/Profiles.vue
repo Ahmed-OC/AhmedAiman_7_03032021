@@ -15,7 +15,10 @@ export default {
     .then(json=>{
       if (json.error ==='Requête non authentifiée')
       {
-        alert('Veuillez vous connecter');
+        this.$swal.fire({
+                title : "Veuillez vous connecter",
+                icon : 'warning'
+                });
         this.$router.push('login');
       }
       else
@@ -34,8 +37,16 @@ export default {
     HeaderForum,ForumPosts,UpdateProfile
   },
   methods : {
+    },
+    watch:{
+    $route(to, from){
+      if((to.params.nickname&&from.params.nickname)&&(to.params.nickname !== from.params.nickname)){
+        location.reload();
+      } 
     }
   }
+  }
+  
 </script>
 
 

@@ -2,6 +2,8 @@ const db = require('../db_connect');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+require('dotenv').config();
+const TOKEN_KEY = process.env.TOKEN_KEY;
 
 
 
@@ -16,7 +18,7 @@ exports.signup = (req,res,next) =>
         var sql = `INSERT INTO users (nickname, email, password, admin, profileimg) VALUES ('${nickname}','${email}','${password}', '0' , '${profileimg}')`;
         db.query(sql, function (err, result) {
              if (err){
-                res.status(403).json({error : err});
+               return res.status(403).json({error : "Les informations entrées sont déjà utilisés "});
              };
              res.status(200).json({message: "Inscription réussi"});
         })
@@ -48,7 +50,7 @@ exports.login = (req,res,next) =>
             userId: result[0].id,
                 token: jwt.sign(
                     {userId : result[0].id},
-                    'RANDOM_TOKEN_SECRET',
+                    TOKEN_KEY,
                     { expiresIn : '24h'}
                 )
         });
@@ -76,6 +78,19 @@ exports.getProfileImageByNickname = (req,res,next) => {
 }
 
 exports.UpdateProfilePicture = (req,res,next) => {
+  db.query(`SELECT profileimg FROM users WHERE nickname=('${req.params.nickname}')`, function (err, result,fields) {
+    if (err){
+      return res.status(403).json({error : err});
+    };
+    const filename = result[0].profileimg.split('/images/')[1];
+    if(filename!=='profil_inconnu.png')
+    {
+      fs.unlink(`images/${filename}`, () =>{
+
+    });
+    }
+  })
+  
   var ProfilePictureUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
   var sql = `UPDATE users SET profileimg = '${ProfilePictureUrl}' WHERE nickname = '${req.params.nickname}'`
   db.query(sql, function (err, result,fields) {

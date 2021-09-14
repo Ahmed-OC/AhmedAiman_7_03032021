@@ -12,6 +12,9 @@ export default {
     }
     }
   },
+  beforeCreate(){
+    localStorage.clear();
+  },
   methods: {
     postLogin(e){
       e.preventDefault();
@@ -19,7 +22,7 @@ export default {
         email : this.email,
         password : this.password
       }
-      fetch('http://localhost:3000/api/auth/login', {
+      fetch('http://localhost:3000/api/users/login', {
           method : "POST",
           body :  JSON.stringify(login),
           headers : {
@@ -39,6 +42,13 @@ export default {
               this.$router.push('forum');
             
           }
+          else{
+            this.$swal.fire({
+            title :"Connexion échouée",
+            icon : 'error',
+            text:json.error});
+          }
+          
           
         })
         .catch((error) => {
@@ -59,7 +69,7 @@ export default {
         <div class="form-group row d-flex justify-content-center">
           <div class="col-8">
           <label for="InputEmail">Email</label>
-          <input v-model='email' type="email" class="form-control" id="InputEmail" name ="InputEmail" placeholder="Email">
+          <input v-model='email' type="email" class="form-control mb-3" id="InputEmail" name ="InputEmail" placeholder="Email">
         </div>
         </div>
         <div class="form-group row d-flex justify-content-center">
@@ -70,13 +80,21 @@ export default {
         </div>
         <button @click="postLogin" type="submit" class="btn btn-primary mt-3 mb-3">Se connecter</button>
       </form>
-      <p class="card-text"><small class="text-muted">Pas de compte ? <router-link  to="/signup">S'inscrire</router-link></small></p>
+      <p class="card-text"><small class="text-muted">Pas de compte ? <router-link class="router-link" to="/signup">S'inscrire</router-link></small></p>
     </div>
   </div>
 
 </template>
 
 <style scoped lang='scss'>
+  .router-link
+  {
+    color: navy;
+  }
+  .card-text
+  {
+    font-weight: bold;
+  }
  .card
   {
     margin-left: auto;
@@ -89,4 +107,8 @@ export default {
  {
    font-weight: bold;
  }
+ label
+{
+  font-weight: bold;
+}
 </style>

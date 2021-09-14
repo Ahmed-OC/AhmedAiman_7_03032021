@@ -3,7 +3,7 @@ export default {
   name: 'CreatePosts',
   data () {
       return {
-          textarea : null, 
+          textarea : "", 
            item:{
           //...
           image : null,
@@ -34,12 +34,19 @@ export default {
             if (json.error ==='Requête non authentifiée')
             {
                 this.$router.push('login');
-                alert('Veuillez vous connecter');
+                this.$swal.fire({
+                title : "Veuillez vous connecter",
+                icon : 'warning'
+                });
             }
+            this.$swal.fire({
+                title : "Votre article a bien été crée",
+                icon : 'success'
+                });
             this.$store.dispatch('setCurrentPosts',json);
             this.item.image = null;
             this.item.imageUrl=null;
-            this.textarea = null;
+            this.textarea = "";
             document.getElementById('image').value='';
         })
         .catch((error) => {
@@ -64,51 +71,60 @@ export default {
 
 <template>
     <div class='createPosts'>
-        <div class='container d-flex mb-3 justify-content-center'>
-            <label v-if="!item.imageUrl" for="image" class="btn">Choisir une image</label>
+        <div class='container d-flex flex-column mb-3 align-items-center' id='createPosts'>
+            <label v-if="!item.imageUrl" for="image" class="btn btn-primary">Choisir une image</label>
             <input @change="uploadImage" id="image" type="file" accept="image/png, image/jpeg, image/jpg" >
-            <div id="preview">
-                <button v-if="item.imageUrl" @click="delImg" id='delbtn'>X</button>
-                <img v-if="item.imageUrl" :src="item.imageUrl" />
+            <div  v-if="item.imageUrl" id="preview">
+                <button @click="delImg" id='delbtn'>X</button>
+                <img alt="Image d'article" :src="item.imageUrl" />
             </div>
-            <textarea v-model="textarea" class="mx-3" placeholder="Quelque chose à partager ?"></textarea>
-            <button class="btn" @click="submitPost" >ENVOYER</button>
+            <textarea v-model='textarea' class="mx-3 my-3" placeholder="Quelque chose à partager ?"></textarea>
+            <button class="btn btn-primary" @click="submitPost" >ENVOYER</button>
         </div>
     </div>
 </template>
 
 <style scoped lang='scss'>
-    #image
+#createPosts
+{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 20px;
+    width: 50%;
+    background-color: #ffd7d7 ;
+}
+#image
+{
+    visibility: hidden;
+    width: 0%;
+    height: 0px;
+}
+textarea{
+    border-radius: 20px;
+    width: 90%;
+}
+.btn
+{
+    border-radius: 20px;
+    @media ( max-width: 991px)
     {
-        visibility: hidden;
-        width: 0%;
+        width: 100%;
     }
-    textarea{
-        border-radius: 20px;
-    }
-    .btn
-    {
-        border-radius: 20px;
-        background-color: #ffd7d7;
-        width: 10%;
-        font-weight: bold;
 
-    }
-    textarea
+    font-weight: bold;
+    word-wrap: break-word;
+}
+#preview
+{
+    position: relative;
+    img
     {
-        width: 50%;
+        height:90px;
+        width: 100%;
     }
-    #preview
+    #delbtn
     {
-        position: relative;
-        img
-        {
-            height:90px;
-            width: 100%;
-        }
-        #delbtn
-        {
-            position: absolute;
-        }
+        position: absolute;
     }
+}
 </style>
