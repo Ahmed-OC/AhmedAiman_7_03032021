@@ -16,6 +16,7 @@ export default {
     localStorage.clear();
   },
   methods: {
+    // Permet de se connecter
     postLogin(e){
       e.preventDefault();
       const login = {

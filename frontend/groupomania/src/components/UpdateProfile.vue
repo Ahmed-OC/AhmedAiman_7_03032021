@@ -3,7 +3,7 @@
 export default {
   name: 'UpdateProfile',
   beforeMount(){
-    fetch('http://localhost:3000/api/users/getProfileImageByNickname/'+this.ProfileNickname,{
+    fetch('http://localhost:3000/api/users/getProfileImageByNickname/'+this.ProfileNickname,{ // Recupère la photo de profil de l'utilisateur
       method :'GET',
       headers : {
         'Authorization' : 'Bearer '+ localStorage.getItem('token'),
@@ -49,11 +49,13 @@ export default {
     }
   },
   methods:{
+    // permet de charger les données de l'image de profil modifié
     updateImage(e) {
       const file = e.target.files[0]
       this.item.image = file
       this.item.imageUrl = URL.createObjectURL(file)
     },
+    // Permet d'envoyer l'image modifie au backend
     uploadImage(){
       const fd = new FormData()
       fd.append('image',this.item.image);
@@ -99,6 +101,7 @@ export default {
                 });
       }
     },
+    // Permet de revenir à l'etat initial des boutons de modifications
     cancelUpdate(){
       this.isUpdating.ProfilePicture=false;
       this.isUpdating.Profile=false;
@@ -106,10 +109,11 @@ export default {
       this.isUpdating.delAccount=false;
       this.item.imageUrl = this.profileImageUrl;
     },
-    passwordValidation (value) {
+    passwordValidation (value) {  // Test regex sur le mot de passe
 			const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
       return regex.test(value)
     },
+    // Permet de modifier son mot de passe
     updatePassword(){
       if (this.passwordValidation(this.newPassword))
       {
@@ -167,6 +171,7 @@ export default {
       }
       
     },
+    // Permet de supprimer son compte
     deleteAccount(){
       fetch('http://localhost:3000/api/users/deleteAccount/' + this.nickname, {
         method: 'DELETE',

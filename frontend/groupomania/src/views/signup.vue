@@ -3,16 +3,7 @@
 import HeaderLogin from '../components/Headerlogin.vue';
 export default {
   name: 'Signup',
-  data(){
-    return {
-      rules: [
-				{ message:'One lowercase letter required.', regex:/[a-z]+/ },
-				{ message:"One uppercase letter required.",  regex:/[A-Z]+/ },
-				{ message:"8 characters minimum.", regex:/.{8,}/ },
-				{ message:"One number required.", regex:/[0-9]+/ }
-			]
-    }
-  },
+  
   beforeCreate(){
     localStorage.clear();
   },
@@ -21,21 +12,24 @@ export default {
   },
   methods : 
   {
+    // test regex sur le pseudo
     textValidation(value) {
       const regex = /^[A-Za-z][^_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{1,}$/;
       return regex.test(value);
     },
+    // test regex sur l'email
     emailValidation(value) {
       const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/;
       return regex.test(value);
     },
+    // test regex sur le mot de passe
     passwordValidation (value) {
 			const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
       return regex.test(value)
     },
 
 
-
+    // Permet de s'inscrire
     postSignup(e){
       e.preventDefault();
       if(this.emailValidation(this.email) && this.passwordValidation(this.password) && this.textValidation(this.nickname))

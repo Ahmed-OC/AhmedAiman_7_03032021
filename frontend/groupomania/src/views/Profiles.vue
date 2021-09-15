@@ -5,7 +5,7 @@ import UpdateProfile from '../components/UpdateProfile.vue';
 export default {
   name: 'Profiles',
     beforeMount(){
-    fetch('http://localhost:3000/api/posts/getPostsByNickname/'+this.nickname,{
+    fetch('http://localhost:3000/api/posts/getPostsByNickname/'+this.nickname,{ // Charge les posts de l'utilisateur dont le profil est visité
       method :'GET',
        headers : {
               'Authorization' : 'Bearer '+ localStorage.getItem('token'),
@@ -40,7 +40,7 @@ export default {
     },
     watch:{
     $route(to, from){
-      if((to.params.nickname&&from.params.nickname)&&(to.params.nickname !== from.params.nickname)){
+      if((to.params.nickname&&from.params.nickname)&&(to.params.nickname !== from.params.nickname)){ // Permet d'actualiser en cas de click sur le bouton profil en étant sur le profil d'un autre utilisateur
         location.reload();
       } 
     }

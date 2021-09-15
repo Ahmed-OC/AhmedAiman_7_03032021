@@ -15,9 +15,9 @@ require('dotenv').config();
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS'); // on donne l'autorisation d'utiliser certaines methodes
     next();
   });
-  app.use(helmet());
-  app.use(express.json());
-  app.use(xss());
+  app.use(helmet());  // permet de proteger l'application de certaines vulnerabilités bien connues du web en configurant de manière appropriés les entetes HTTP
+  app.use(express.json()); // transforme le corps de la requete post en JSON 
+  app.use(xss()); // permet d'empecher l'utilisation cross site scripting
   app.use('/images', express.static(path.join(__dirname, 'images'))); // Permet que les requetes à /images/ servent le dossier images
   app.use('/api/users', userRoutes);
   app.use('/api/posts', postsRoutes)

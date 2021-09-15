@@ -56,7 +56,8 @@ export default {
   },
    props:['postsList','nicknameprop'] 
   ,
-  beforeMount(){
+  // Permet de recupérer tous les articles et de les stocker dans le store
+  beforeMount(){ 
     fetch('http://localhost:3000/api/posts/getAllPosts',{
       method :'GET',
        headers : {
@@ -81,6 +82,7 @@ export default {
     .catch(err=>err);
   },
   methods : {
+    //permet de supprimer un article
     delPost(postid)
     {
       fetch('http://localhost:3000/api/posts/deletePost/' + postid, {
@@ -106,12 +108,14 @@ export default {
       })
       .catch(err=>err);
     },
+    //permet de voir les outils de modification sur l'article selectionné 
     displayPostUpdate(postid,imageUrl,post_text)
     {
       this.currentPostUpdate = postid;
       this.updatePost.imageUrl=imageUrl;
       this.updatePost.textarea=post_text;
     },
+    //Permet de supprimer une image
     delImg()
     {
       this.updatePost.imageUrl=null;
@@ -119,12 +123,14 @@ export default {
       this.updatePost.imageDeleted=1;
       document.getElementById('imageupdate').value='';
     },
+    //Permet de charger les données de l'image upload
     uploadImage(e) 
     {
       const file = e.target.files[0]
       this.updatePost.image = file
       this.updatePost.imageUrl = URL.createObjectURL(file)
     },
+    // Permet d'envoyer les informations de modifications d'un article
      postUpdating()
     {
           const fd = new FormData()
