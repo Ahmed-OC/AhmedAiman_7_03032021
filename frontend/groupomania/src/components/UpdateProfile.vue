@@ -1,8 +1,18 @@
 <script>
-
 export default {
   name: 'UpdateProfile',
   beforeMount(){
+    fetch('http://localhost:3000/api/users/getCurrentUser',{
+    method :'GET',
+    headers : {
+      'Authorization' : 'Bearer '+ localStorage.getItem('token')
+    }
+  })
+  .then(posts=> posts.json())
+  .then(json=>{
+    this.nickname= json[0].nickname
+  })
+  .catch(err=>err);
     fetch('http://localhost:3000/api/users/getProfileImageByNickname/'+this.ProfileNickname,{ // Recupère la photo de profil de l'utilisateur
       method :'GET',
       headers : {
@@ -11,23 +21,23 @@ export default {
     })
     .then(posts=> posts.json())
     .then(json=>{
-        if (json.error ==='Requête non authentifiée')
-        {
-            this.$router.push('login');
-            this.$swal.fire({
-                title : "Veuillez vous connecter",
-                icon : 'warning'
-                });
-        }
-        if(json.error)
-        {
-          this.$swal.fire({
-            title :json.error,
-            icon : 'error'});
-          this.$router.push('forum')
-        }
-        this.profileImageUrl=json;
-        this.item.imageUrl=json
+      if (json.error ==='Requête non authentifiée')
+      {
+        this.$swal.fire({
+          title :"Veuillez vous connecter",
+          icon : 'warning',
+        text:json.error});
+        this.$router.push('login')
+      }
+      if(json.error)
+      {
+        this.$swal.fire({
+          title :json.error,
+          icon : 'error'});
+        this.$router.push('forum')
+      }
+      this.profileImageUrl=json;
+      this.item.imageUrl=json
     })
     .catch(err=>(err));
   },
@@ -43,20 +53,22 @@ export default {
       image : null,
       imageUrl: null,
       },
-      nickname:localStorage.nickname,
+      nickname:null,
       profileImageUrl:null ,
       ProfileNickname: window.location.href.split('profiles:')[1],
     }
   },
   methods:{
-    // permet de charger les données de l'image de profil modifié
-    updateImage(e) {
+    passwordValidation (value) { // Test regex sur le mot de passe
+      const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/ ;
+      return regex.test(value);
+    },
+    updateImage(e) { // permet de charger les données de l'image de profil modifié
       const file = e.target.files[0]
       this.item.image = file
       this.item.imageUrl = URL.createObjectURL(file)
     },
-    // Permet d'envoyer l'image modifie au backend
-    uploadImage(){
+    uploadImage(){  // Permet d'envoyer l'image modifie au backend
       const fd = new FormData()
       fd.append('image',this.item.image);
       if (document.getElementById('image').value!="")
@@ -74,52 +86,47 @@ export default {
         })
         .then((json) => {
           if (json.error ==='Requête non authentifiée')
-            {
-                this.$router.push('login');
-                this.$swal.fire({
-                title : "Veuillez vous connecter",
-                icon : 'warning'
-                });
-            }
-           this.$swal.fire({
-                title : "Votre photo de profil a bien été modifié",
-                icon : 'success'
-                }); 
-          this.item.image=null;
-          this.item.imageUrl=json;
-          this.profileImageUrl=json;
-          this.isUpdating.ProfilePicture=!this.isUpdating.ProfilePicture;
-          this.isUpdating.Profile=!this.isUpdating.Profile;
+          {
+            this.$swal.fire({
+              title :"Veuillez vous connecter",
+              icon : 'warning',
+            text:json.error});
+            this.$router.push('login')
+          }
+          else{
+            this.item.image=null;
+            this.item.imageUrl=json;
+            this.profileImageUrl=json;
+            this.isUpdating.ProfilePicture=!this.isUpdating.ProfilePicture;
+            this.isUpdating.Profile=!this.isUpdating.Profile;
+            this.$swal.fire({
+              title :"Votre photo de profil a bien été modifié",
+              icon : 'success'});
+          }
+          
         })
         .catch((error) => error)
       }
       else
       {
         this.$swal.fire({
-                title : "Veuillez choisir une image",
-                icon : 'warning'
-                });
+          title :"Veuillez choisir une nouvelle image",
+          icon : 'warning'});
       }
     },
-    // Permet de revenir à l'etat initial des boutons de modifications
-    cancelUpdate(){
+    cancelUpdate(){ // Permet de revenir à l'etat initial des boutons de modifications
       this.isUpdating.ProfilePicture=false;
       this.isUpdating.Profile=false;
       this.isUpdating.Password=false;
       this.isUpdating.delAccount=false;
       this.item.imageUrl = this.profileImageUrl;
     },
-    passwordValidation (value) {  // Test regex sur le mot de passe
-			const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
-      return regex.test(value)
-    },
-    // Permet de modifier son mot de passe
-    updatePassword(){
+    updatePassword(){ // Permet de modifier son mot de passe
       if (this.passwordValidation(this.newPassword))
       {
         const passwordUpdating = {
-        currentPassword : this.currentPassword,
-        newPassword : this.newPassword
+          currentPassword : this.currentPassword,
+          newPassword : this.newPassword
         }
         fetch('http://localhost:3000/api/users/UpdatePassword/' + this.nickname, {
           method : "PUT",
@@ -136,43 +143,40 @@ export default {
         .then((json) => {
           if (json.error ==='Requête non authentifiée')
           {
-            this.$swal.fire({
-                  title : "Veuillez vous connecter",
-                  icon : 'warning'
-                  });
-            this.$router.push('login');
+          this.$swal.fire({
+            title :"Veuillez vous connecter",
+            icon : 'warning',
+          text:json.error});
+          this.$router.push('login')
           }
           if(json.error)
           {
             this.$swal.fire({
-                  title : json.error,
-                  icon : 'error'
-                  });
+              title :"Mot de passe non modifié",
+              icon : 'error',
+              text:json.error});
           }
           else
           {
             this.$swal.fire({
-                  title : json.message,
-                  icon : 'success'
-                  });
+              title :json.message,
+              icon : 'success'});
+            this.isUpdating.Password=false;
+            this.isUpdating.Profile=false;
           }
-          
         })
         .catch((error) => error);
-        this.isUpdating.Password=false;
-        this.isUpdating.Profile=false;
-      }
-      else
-      {
+        
+        }
+        else
+        {
         this.$swal.fire({
-                  title : "Votre nouveau mot de passe doit contenir : 1 majuscule, 1 minuscule, 1 chiffre et 8 caractères",
-                  icon : 'warning'
-                  });
-      }
-      
+          title :"Mot de passe non modifié",
+          icon : 'error',
+          text :"Votre mot de passe doit contenir : 1 majuscule,1 minuscule et 8 caracteres"});
+        }
     },
-    // Permet de supprimer son compte
-    deleteAccount(){
+    deleteAccount(){ // Permet de supprimer son compte
       fetch('http://localhost:3000/api/users/deleteAccount/' + this.nickname, {
         method: 'DELETE',
         headers : {'Authorization' : 'Bearer '+ localStorage.getItem('token')}
@@ -181,19 +185,18 @@ export default {
       .then(json => {
         if (json.error ==='Requête non authentifiée')
         {
-          this.$swal.fire({
-                title : "Veuillez vous connecter",
-                icon : 'warning'
-                });
-          this.$router.push('login');
+        this.$swal.fire({
+          title :"Veuillez vous connecter",
+          icon : 'warning',
+        text:json.error});
+        this.$router.push('login')
         }
         if (json.error)
         {
-          this.$swal.fire({
-                title : "Votre compte n'a pas été supprimé",
-                icon : 'error',
-                text : json.error
-                });
+        this.$swal.fire({
+          title :"Votre compte n'a pas été supprimé",
+          icon : 'danger',
+        text:json.error});
         }
         else
         {
@@ -201,15 +204,12 @@ export default {
           this.$store.dispatch('setCurrentPostsByNickname',this.nickname);
           localStorage.clear();
           this.$router.push('login');
-          
           this.$swal.fire({
-                title : json.message,
-                icon : 'success'
-                });
+            title :json.message,
+            icon : 'success'});
         }
       })
      .catch(err=>err);
-     console.log(this.$store.state.Posts)
     }
   }
 }
@@ -217,13 +217,13 @@ export default {
 
 <template>
   <div id='updateprofile'>
-    <img :src="this.profileImageUrl" alt="Photo de profil" v-if="isUpdating.ProfilePicture==false"/>
+    <img alt="Photo de profil" :src="this.profileImageUrl" v-if="isUpdating.ProfilePicture==false"/>
     
     <div v-if='isUpdating.ProfilePicture' id='updatingProfilePicture'>
       <label v-if="isUpdating.ProfilePicture==true" for="image" class="btn mb-2">Choisir une image</label>
       <input @change="updateImage" id="image" type="file" accept="image/png, image/jpeg, image/jpg" >
       <div id="preview">
-        <img :src="this.item.imageUrl" alt="Photo de profil de modification" class='mb-2' />
+        <img alt="Photo de profil" :src="this.item.imageUrl" class='mb-2' />
       </div>
       <button @click="uploadImage" class='btn btn-primary'>Envoyer</button>
       <button class='btn btn-danger mx-2' @click="cancelUpdate">Annuler</button>

@@ -1,9 +1,9 @@
-<template>
+<template>  
   <div class='forumPosts'>
     <div class='container '>
-      <div v-for="item in postsList" :key="item.imageUrl">
+      <div v-for="item in postsList" :key="item.id"> 
           <div v-if='this.currentPostUpdate!==item.id' class='postDisplayed card mb-5 mx-auto'>
-            <img v-if='item.imageUrl' :src="item.imageUrl" class="card-img-top" alt="Image d'article">
+            <img  v-if='item.imageUrl' :src="item.imageUrl" class="card-img-top" alt="Image d'article">
             <div class="card-body">
               <p class="card-text">{{item.post_text}}</p>
               <p class="card-text"><small class="text-muted">Publié par <router-link class="router-link" :to="{path:'/profiles:'+item.nickname}">{{item.nickname}}</router-link> </small></p>
@@ -11,34 +11,31 @@
             <button v-if="this.nickname==item.nickname || this.admin==1"  @click="delPost(item.id)" class="btn mb-1">Supprimer</button>
             <button v-if="this.nickname==item.nickname || this.admin==1" @click='displayPostUpdate(item.id,item.imageUrl,item.post_text)' class="btn ">Modifier</button>
           </div>
-
           <div v-else class='postUpdate'>
             <div class='container d-flex mb-3 justify-content-center'>
               <label v-if="!this.updatePost.imageUrl" for="imageupdate" class="btn">Choisir une image</label>
               <input @change="uploadImage" id="imageupdate" type="file" accept="image/png, image/jpeg, image/jpg" >
               <div  v-if="this.updatePost.imageUrl" id="preview">
                   <button @click="delImg" id='delbtn'>X</button>
-                  <img :src="this.updatePost.imageUrl" alt="Image de modification" />
+                  <img :src="this.updatePost.imageUrl"/>
               </div>
               <textarea v-model='updatePost.textarea' class="mx-3" placeholder="Quelque chose à partager ?"></textarea>
               <div class='d-flex flex-column'>
                 <button class="btn mb-2" @click="postUpdating">MODIFIER</button>
-                <button class="btn" @click="this.currentPostUpdate=null;this.updatePost.imageDeleted=0" >ANNULER</button>
+                <button class="btn" @click="cancelUpdate" >ANNULER</button>
               </div>
             </div>
           </div>
-
       </div>
     </div>
   </div>
 </template>
 
-
 <script>
 export default {
   name: 'ForumPosts',
+  props:['postsList','nicknameprop'],
   data (){
-    
     return {
       nicknamep : this.nicknameprop,
       updatePost :{
@@ -47,64 +44,82 @@ export default {
         textarea:null,
         imageDeleted:0,
       },
-      nickname : localStorage.nickname,
-      admin : localStorage.admin,
+      nickname:null,
+      admin : null,
       currentPostUpdate : null,
     }
-    
-    
   },
-   props:['postsList','nicknameprop'] 
-  ,
-  // Permet de recupérer tous les articles et de les stocker dans le store
   beforeMount(){ 
-    fetch('http://localhost:3000/api/posts/getAllPosts',{
+    fetch('http://localhost:3000/api/users/getCurrentUser',{
+        method :'GET',
+        headers : {
+          'Authorization' : 'Bearer '+ localStorage.getItem('token')
+        }
+      })
+      .then(posts=> posts.json())
+      .then(json=>{
+        this.nickname= json[0].nickname
+        this.admin= json[0].admin
+      })
+      .catch(err=>err);
+    
+    fetch('http://localhost:3000/api/posts/getAllPosts',{// Permet de recupérer tous les articles et de les stocker dans le store
       method :'GET',
-       headers : {
-              'Authorization' : 'Bearer '+ localStorage.getItem('token'),
-          }
+      headers : {
+        'Authorization' : 'Bearer '+ localStorage.getItem('token')
+      }
     })
     .then(posts=> posts.json())
     .then(json=>{
-      if (json.error ==='Requête non authentifiée')
+      if (json.error)
       {
-        this.$router.push('login');
         this.$swal.fire({
-                title : "Veuillez vous connecter",
-                icon : 'warning'
-                });
+          title :"Veuillez vous connecter",
+          icon : 'warning',
+        text:json.error});
+        this.$router.push('login')
       }
       else
       {
-        this.$store.dispatch('setCurrentPosts',json);
+        this.$store.dispatch('setCurrentPosts',json); 
       }
     })
     .catch(err=>err);
   },
-  methods : {
+  methods :{ 
+    // Permet d'annuler la modification d'un article
+    cancelUpdate()
+    {
+      this.currentPostUpdate=null;
+      this.updatePost.imageDeleted=0
+    }
+    ,
     //permet de supprimer un article
     delPost(postid)
     {
       fetch('http://localhost:3000/api/posts/deletePost/' + postid, {
-      method: 'DELETE',
-      headers : {'Authorization' : 'Bearer '+ localStorage.getItem('token')}
+        method: 'DELETE',
+        headers : {'Authorization' : 'Bearer '+ localStorage.getItem('token')}
       })
       .then(res => res.json()) 
       .then(json => {
         if (json.error ==='Requête non authentifiée')
         {
-          this.$router.push('login');
-          this.$swal.fire({
-                title : "Veuillez vous connecter",
-                icon : 'warning'
-                });
-        }
         this.$swal.fire({
-                title : "Votre article a bien été supprimé",
-                icon : 'success'
-                });
-        this.$store.dispatch('setCurrentPosts',json);
-        this.$store.dispatch('setCurrentPostsByNickname',this.nicknamep);
+          title :"Veuillez vous connecter",
+          icon : 'warning',
+        text:json.error});
+        this.$router.push('login')
+        }
+        else
+        {
+          this.$store.dispatch('setCurrentPostsByNickname',this.nicknamep);
+          this.$store.dispatch('setCurrentPosts',json);
+          this.$swal.fire({
+          title :"Votre article a bien été supprimé",
+          icon : 'success'});
+        }
+        
       })
       .catch(err=>err);
     },
@@ -131,101 +146,101 @@ export default {
       this.updatePost.imageUrl = URL.createObjectURL(file)
     },
     // Permet d'envoyer les informations de modifications d'un article
-     postUpdating()
-    {
-          const fd = new FormData()
-          fd.append('image',this.updatePost.image);
-          fd.append('post_text',this.updatePost.textarea);
-          fd.append('imagedeleted',this.updatePost.imageDeleted)     
-          fetch('http://localhost:3000/api/posts/updatePost/'+ this.currentPostUpdate, {
-          method : "PUT",
-          body :  fd,
-          headers : {
-              'Accept': 'application/json',
-              'Authorization' : 'Bearer '+ localStorage.getItem('token'),
-          }
-        })
-        .then((response) => {
-            return response.json();
-        })
-        .then((json) => {
-            if (json.error ==='Requête non authentifiée')
-            {
-              this.$router.push('login');
-              this.$swal.fire({
-                title : "Veuillez vous connecter",
-                icon : 'warning'
-                });
-            }
-            this.$swal.fire({
-                title : "Votre article a bien été modifié",
-                icon : 'success'
-                });
-            this.$store.dispatch('setCurrentPosts',json);
-            this.$store.dispatch('setCurrentPostsByNickname',this.nicknamep);
-            this.updatePost.image=null;
-            this.imageDeleted = 0;
-        })
-        .catch((error) => {
-            console.log(error);
-        })
-        this.currentPostUpdate=null;
+    postUpdating()
+    { 
+      const fd = new FormData()
+      fd.append('image',this.updatePost.image);
+      fd.append('post_text',this.updatePost.textarea);
+      fd.append('imagedeleted',this.updatePost.imageDeleted) 
+      this.updatePost.imageDeleted=0;
+      this.updatePost.image=null;
+      this.updatePost.imageUrl=null;
+      document.getElementById('imageupdate').value='' 
+      fetch('http://localhost:3000/api/posts/updatePost/'+ this.currentPostUpdate, {
+        method : "PUT",
+        body :  fd,
+        headers : {
+            'Accept': 'application/json',
+            'Authorization' : 'Bearer '+ localStorage.getItem('token'),
+        }
+      })
+      .then((response) => {
+          return response.json();
+      })
+      .then((json) => {
+        if (json.error ==='Requête non authentifiée')
+        {
+        this.$swal.fire({
+          title :"Veuillez vous connecter",
+          icon : 'warning',
+        text:json.error});
+        this.$router.push('login')
+        }
+        else
+        {
+          this.$store.dispatch('setCurrentPostsByNickname',this.nicknamep);
+          this.$store.dispatch('setCurrentPosts',json);
+          this.$swal.fire({
+            title :"Votre article a bien été modifié",
+            icon : 'success'});
+        }        
+      })
+      .catch((error) => {error;
+      })
+    this.currentPostUpdate=null
     }
-   
   }
-} 
+}
 </script>
 
 <style scoped lang='scss'>
 .router-link
+{
+  color : navy;
+}
+#imageupdate
+{
+  visibility: hidden;
+  width: 0%;
+}
+.btn
+{
+  background-color:#ffd7d7 ;
+  display:inline;
+  border-radius: 0px;
+}
+.card
+{
+  width: 70%;
+  border-radius: 20px 20px 0px 0px;
+  img
   {
-    color: navy;
-    font-weight: bold;
-  }
- #imageupdate
-    {
-        visibility: hidden;
-        width: 0%;
-    }
-  .btn
-  {
-    background-color:#ffd7d7 ;
-    display:inline;
-    border-radius: 0px;
-  }
-  .card
-  {
-
-    width: 70%;
     border-radius: 20px 20px 0px 0px;
-    img
-    {
-      border-radius: 20px 20px 0px 0px;
-      max-height: 300px;
-      box-sizing: content-box;
-    }
+    max-height: 300px;
+    box-sizing: content-box;
   }
-      #image
-    {
-        visibility: hidden;
-        width: 0%;
-    }
-    textarea{
-        border-radius: 20px;
-        width: 50%;
-    }
-
-    #preview
-    {
-        position: relative;
-        img
-        {
-            height:90px;
-            width: 100%;
-        }
-        #delbtn
-        {
-            position: absolute;
-        }
-    }
+}
+#image
+{
+  visibility: hidden;
+  width: 0%;
+}
+textarea
+{
+  border-radius: 20px;
+  width: 60%;
+}
+#preview
+{
+  position: relative;
+  img
+  {
+    height:90px;
+    width: 100%;
+  }
+  #delbtn
+  {
+    position: absolute;
+  }
+}
 </style>
