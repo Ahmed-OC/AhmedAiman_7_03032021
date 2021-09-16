@@ -13,8 +13,8 @@ exports.signup = (req,res,next) =>
     bcrypt.hash(req.body.password,10) // Récupération du mot de passe de la requête et hashage à l'aide de bcrypt
     .then(hash=>{
         const password=hash;
-        const profileimg = `${req.protocol}://${req.get('host')}/images/no-picture.jpg` // Initialisation de l'image de base des utilisateurs 
-        var sql = `INSERT INTO users (nickname, email, password, admin, profileimg) VALUES ('${nickname}','${email}','${password}', '0' , '${profileimg}')`; // Ajout de l'utilisateur dans la base de donnée
+        const profileimg = `${req.protocol}://${req.get('host')}/images/profil_inconnu.png` // Initialisation de l'image de base des utilisateurs 
+        var sql = `INSERT INTO users (nickname, email, password, admin, profileimg) VALUES ('${nickname}','${email}',\"${password}"\, '0' , '${profileimg}')`; // Ajout de l'utilisateur dans la base de donnée
         db.query(sql, function (err, result) {
              if (err){
                 return res.status(403).json({error : "Les informations entrées sont déjà utilisées"}); // Si le nickname et/ou l'email est déjà utilisé : renvoi d'un message d'erreur pour avertir l'utilisateur
