@@ -3,7 +3,6 @@ const path = require('path'); // Permet d'avoir acces aux chemins de notre syste
 const userRoutes = require('./routes/user');
 const postsRoutes = require('./routes/posts');
 
-const xss = require('xss-clean');
 const helmet = require('helmet');
 require('dotenv').config();
 
@@ -17,7 +16,6 @@ require('dotenv').config();
   });
  
   app.use(express.json()); // transforme le corps de la requete post en JSON 
-  app.use(xss()); // permet d'empecher l'utilisation cross site scripting
   app.use('/images', express.static(path.join(__dirname, 'images'))); // Permet que les requetes à /images/ servent le dossier images
   app.use('/api/users', userRoutes);
   app.use('/api/posts', postsRoutes)

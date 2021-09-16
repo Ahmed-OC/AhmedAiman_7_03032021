@@ -1,6 +1,8 @@
 const db = require('../db_connect'); // Importation du fichier contenant les paramètre de connexion de la base de données, nous permettant ainsi d'interagir avec la base de donnée
 const fs = require('fs'); // Importation de fs nous permettant d'interagir avec les fichiers du dossier images
 const jwt = require('jsonwebtoken'); //Importation de jsonwebtoken afin de decrypter le token
+const sanitizeHtml = require('sanitize-html');
+
 require('dotenv').config(); // Importation de dotenv nous permettant d'utilliser les variables d'environnement
 
 // Fonction permettant de creer un article 
@@ -12,7 +14,7 @@ exports.createPost = (req, res , next) => {
     {
       imageUrl =`${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
     }
-    const post_text = req.body.post_text;
+    const post_text = sanitizeHtml(req.body.post_text);
     const nickname = decodedToken.nickname;
     var sql = `INSERT INTO posts (nickname, imageUrl, post_text) VALUES ('${nickname}','${imageUrl}','${post_text}')`; // configuration de l'article
     db.query(sql, function (err, result) {
@@ -96,7 +98,7 @@ exports.updatePost = (req,res,next) => {
         })
       }
     }
-    db.query(`UPDATE posts SET post_text = \"${req.body.post_text}"\ WHERE id = '${req.params.id}'`, function (err, result,fields) { // Mise à jour du texte de l'article
+    db.query(`UPDATE posts SET post_text = "${sanitizeHtml(req.body.post_text)}" WHERE id = '${req.params.id}'`, function (err, result,fields) { // Mise à jour du texte de l'article
       if (err){
          return res.status(403).json({error : err});
       };
